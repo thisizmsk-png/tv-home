@@ -33,9 +33,10 @@ async function press(name, times = 1) {
 
 await send('Runtime.enable');
 await send('Page.enable');
+await send('Performance.enable');
 // Keys sent before the app list loads are lost, so wait for the first build.
 for (let i = 0; i < 40 && !/^style-/.test(await evaluate('document.body.className') || ''); i++) await sleep(500);
-await sleep(1000);
+await sleep(Number(process.env.SETTLE_MS || 1000));
 console.log('state', JSON.stringify(await evaluate(`({
   style: document.body.className,
   apps: [].map.call(document.querySelectorAll('.tile .name, .item'), n => n.firstChild && n.firstChild.textContent),
@@ -52,9 +53,15 @@ for (let i = 0; i < styles.length; i++) {
   await press('right');
   const lag = Date.now() - t0;
   await sleep(900);
+  // Smoothness while idle on this style: frames drawn in 3 s and frames that took over 50 ms.
+  const frames = (await send('Runtime.evaluate', { awaitPromise: true, returnByValue: true, expression: `new Promise(r => {
+    let n = 0, slow = 0, last = performance.now(); const end = last + 3000;
+    (function tick(t) { n++; if (t - last > 50) slow++; last = t; t < end ? requestAnimationFrame(tick) : r({ n, slow }); })(last);
+  })` })).result?.result?.value;
+  const heap = (await send('Performance.getMetrics')).result?.metrics?.find((m) => m.name === 'JSHeapUsedSize')?.value;
   const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 70 });
   if (shot.result?.data) writeFileSync(join(out, `tv-real-${i + 1}-${styles[i]}.jpg`), Buffer.from(shot.result.data, 'base64'));
-  console.log(styles[i], 'body:', await evaluate('document.body.className'), 'key round trip ms:', lag, shot.result ? 'shot ok' : 'shot failed ' + JSON.stringify(shot.error));
+  console.log(styles[i], 'body:', await evaluate('document.body.className'), 'key round trip ms:', lag, 'fps:', frames && Math.round(frames.n / 3), 'slow frames:', frames && frames.slow, 'heap MB:', heap && (heap / 1048576).toFixed(1), shot.result ? 'shot ok' : 'shot failed ' + JSON.stringify(shot.error));
 }
 // Leave the TV on the style it started with.
 const back = styles.indexOf((start || '').replace('style-', '').split(' ')[0]);

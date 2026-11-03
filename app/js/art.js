@@ -5,7 +5,7 @@
 
   var API = 'https://api.themoviedb.org/3';
   var IMG = 'https://image.tmdb.org/t/p/';
-  var CACHE = 'tvhome.tmdb.v1';
+  var CACHE = 'tvhome.tmdb.v2';
   var TTL = 12 * 3600 * 1000;
   var KEY = window.TVHOME_TMDB_KEY || '';
 
@@ -72,7 +72,8 @@
     return {
       id: r.id, media: r.media_type || media, title: r.name || r.title,
       sub: type + (year ? ' · ' + year : ''), popularity: r.popularity || 0,
-      backdrop: IMG + 'w1280' + r.backdrop_path, card: IMG + 'w780' + r.backdrop_path,
+      // Cards show at 326 px wide, so w300 is enough; w780 was 4x the bytes.
+      backdrop: IMG + 'w1280' + r.backdrop_path, card: IMG + 'w300' + r.backdrop_path,
       poster: IMG + 'w342' + r.poster_path
     };
   }
@@ -115,6 +116,11 @@
         }
       });
     });
+  };
+
+  // Fetch each app's first backdrop ahead of time so moving across tiles shows art at once.
+  art.preload = function (entries) {
+    entries.forEach(function (e, i) { new Image().src = art.items(e, i)[0].backdrop; });
   };
 
   // Lead cast member of a title, for the Cast style.

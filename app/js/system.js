@@ -12,13 +12,15 @@
     'com.samsung.tv.aria-video': '3201807016597'
   };
   var YOUTUBE_STORE_ID = '111299001912';
-  var HIDDEN = /service|emanual|companion|dummy|widget|DclHome001|TvHome0001/i;
+  var HIDDEN = /service|emanual|companion|dummy|widget|klyq|DclHome001|TvHome0001/i;
   var ORDER = ['netflix', 'prime video', 'youtube', 'apple tv'];
+  // logo: a key in TH.LOGOS (logos.js, Simple Icons, CC0), drawn in fg. Prime Video's logo was withdrawn
+  // from Simple Icons at Amazon's request, so it gets a typeset wordmark instead.
   var BRAND = {
-    netflix: { key: 'netflix', color: '#7c1a20' },
-    'prime video': { key: 'prime', color: '#14405f' },
-    youtube: { key: 'youtube', color: '#5e1d1d' },
-    'apple tv': { key: 'appletv', color: '#2a2d33' }
+    netflix: { key: 'netflix', color: '#000000', fg: '#e50914', logo: 'netflix' },
+    'prime video': { key: 'prime', color: '#1a98ff', fg: '#ffffff', wordmark: 'prime video' },
+    youtube: { key: 'youtube', color: '#0f0f0f', fg: '#ff0000', logo: 'youtube' },
+    'apple tv': { key: 'appletv', color: '#000000', fg: '#ffffff', logo: 'appletv' }
   };
 
   function brandFor(name) {
@@ -36,7 +38,8 @@
   function appEntry(id, name, icon) {
     var b = brandFor(name);
     var storeId = STORE_IDS[id] || (/^youtube$/i.test(name) ? YOUTUBE_STORE_ID : null);
-    return { kind: 'app', id: id, storeId: storeId, name: name, icon: icon || '', key: b.key, color: b.color };
+    return { kind: 'app', id: id, storeId: storeId, name: name, icon: icon || '', key: b.key, color: b.color,
+      fg: b.fg, logo: b.logo, wordmark: b.wordmark };
   }
 
   function hdmiEntry(source) {
@@ -48,7 +51,7 @@
 
   TH.loadEntries = function (done) {
     if (!tz || !tz.application) {  // desktop preview
-      var demo = ['Netflix', 'Prime Video', 'YouTube', 'Apple TV', 'klyq'].map(function (n, i) {
+      var demo = ['Netflix', 'Prime Video', 'YouTube', 'Apple TV'].map(function (n, i) {
         return appEntry('demo' + i, n, '');
       });
       demo.push(hdmiEntry({ type: 'HDMI', number: 1, editName: 'Fire TV' }));

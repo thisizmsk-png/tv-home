@@ -40,4 +40,5 @@ node tools/tv-check.mjs <out-dir>                           # on the TV: errors,
 - `app/service/` is the Home-button watcher from AeroTizen 2.5.0 by Hamza El Alaoui, MIT (`app/service/LICENSE-AeroTizen`), with the app ID and port changed.
 - Fonts: Big Shoulders Display, Hanken Grotesk, JetBrains Mono, SIL Open Font License.
 - Fallback art: Art Institute of Chicago public-domain images, CC0.
+- App logos (Netflix, YouTube, Apple TV): Simple Icons 16.35.0, CC0 (`app/js/logos.js`). The marks are trademarks of their owners and are used only to label the apps. Prime Video is a typeset wordmark because Amazon had its logo withdrawn from Simple Icons.
 - Trending art and data from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.

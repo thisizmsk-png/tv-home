@@ -36,6 +36,16 @@
   function tile(entry) {
     var t = el('div', 'tile');
     t.style.backgroundColor = entry.color;
+    if (entry.logo || entry.wordmark) {
+      t.classList.add('brand');
+      t.style.color = entry.fg;
+      var mark = el('span', entry.logo ? 'logo' : 'wordmark', entry.wordmark || '');
+      if (entry.logo) {
+        mark.innerHTML = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="' + TH.LOGOS[entry.logo] + '"/></svg>';
+      }
+      t.appendChild(mark);
+      return t;
+    }
     if (entry.icon) {
       var img = el('img', 'icon');
       img.src = entry.icon;

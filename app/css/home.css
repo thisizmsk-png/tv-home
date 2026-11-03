@@ -26,8 +26,6 @@ body.input > *:not(#hdmi):not(#toast) { visibility: hidden; }
 /* ---- shared layers ---- */
 .bg { position: absolute; inset: -40px; background: center / cover no-repeat; opacity: 0; transition: opacity .45s ease; }
 .bg.on { opacity: 1; }
-.style-marquee .bg.on, .style-shelf .bg.on { animation: drift 34s ease-in-out infinite alternate; }
-@keyframes drift { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.05) translate(-18px, 10px); } }
 .scrim { position: absolute; inset: 0; pointer-events: none; }
 .field { position: absolute; inset: 0; transition: background-color .4s ease; }
 .wall { position: absolute; inset: 0; display: none; }
@@ -61,6 +59,10 @@ body.input > *:not(#hdmi):not(#toast) { visibility: hidden; }
 .tile .icon { position: absolute; left: 16px; top: 14px; width: 52px; height: 52px; object-fit: contain; border-radius: 6px; }
 .tile .name { font: 600 24px/1.1 var(--body); }
 .tile small { display: block; font: 500 16px/1.3 var(--mono); opacity: .7; }
+.tile.brand { justify-content: center; align-items: center; box-shadow: inset 0 0 0 2px rgba(241,239,233,.14); }
+.tile .logo { position: absolute; inset: 24% 20%; }
+.tile .logo svg { width: 100%; height: 100%; display: block; }
+.tile .wordmark { font: 700 34px/1 var(--body); letter-spacing: -.02em; }
 
 /* ---- 1 Marquee ---- */
 .style-marquee .scrim { background:
@@ -110,5 +112,5 @@ body.input > *:not(#hdmi):not(#toast) { visibility: hidden; }
 .style-cast .kicker { color: var(--paper); }
 
 @media (prefers-reduced-motion: reduce) {
-  .bg.on, .wall .col { animation: none !important; }
+  .wall .col { animation: none !important; }
 }

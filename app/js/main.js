@@ -119,6 +119,9 @@
     document.body.classList.remove('loading');
     build();
     TH.tell('/home');
-    TH.art.refresh(st.entries, function (changed) { if (changed) { build(); } });
+    TH.art.refresh(st.entries, function (changed) {
+      if (changed) { build(); }
+      TH.art.preload(st.entries);
+    });
   });
 })(window.TH);
