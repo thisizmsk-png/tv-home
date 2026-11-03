@@ -99,9 +99,11 @@
   }
 
   // Calls done(changed) once every app's art is known.
+  var busy = false;
   art.refresh = function (entries, done) {
-    if (!KEY) { return done(false); }
+    if (!KEY || busy) { return done(false); }
     if (data && Date.now() - data.at < TTL) { return done(false); }
+    busy = true;
     var keys = [];
     entries.forEach(function (e) { if (keys.indexOf(e.key) < 0) { keys.push(e.key); } });
     var next = { at: Date.now(), items: {} }, left = keys.length, got = 0;
@@ -109,6 +111,7 @@
       fetchSource(SOURCES[k] || SOURCES.other, function (items) {
         if (items.length) { next.items[k] = items; got++; }
         if (--left === 0) {
+          busy = false;
           if (!got) { return done(false); }  // offline: keep the old art
           data = next;
           TH.save(CACHE, data);

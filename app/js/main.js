@@ -98,8 +98,18 @@
     e.preventDefault();
   });
 
+  // TV Home can stay suspended for days, so check for new art (12 h TTL) hourly and on every return.
+  function refreshArt() {
+    if (!st.entries.length) { return; }
+    TH.art.refresh(st.entries, function (changed) {
+      if (changed) { build(); }
+      TH.art.preload(st.entries);
+    });
+  }
+  setInterval(refreshArt, 3600 * 1000);
+
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) { TH.tell('/home'); }
+    if (!document.hidden) { TH.tell('/home'); refreshArt(); }
   });
 
   // Every 20 s the art moves on to the next trending title for the focused app.
@@ -119,9 +129,6 @@
     document.body.classList.remove('loading');
     build();
     TH.tell('/home');
-    TH.art.refresh(st.entries, function (changed) {
-      if (changed) { build(); }
-      TH.art.preload(st.entries);
-    });
+    refreshArt();
   });
 })(window.TH);
