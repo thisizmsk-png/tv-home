@@ -12,6 +12,7 @@
     'com.samsung.tv.aria-video': '3201807016597'
   };
   var YOUTUBE_STORE_ID = '111299001912';
+  var INPUTS = 'tvhome.inputs.v1';
   var HIDDEN = /service|emanual|companion|dummy|widget|klyq|DclHome001|TvHome0001/i;
   var ORDER = ['netflix', 'prime video', 'youtube', 'apple tv'];
   // logo: a key in TH.LOGOS (logos.js, Simple Icons, CC0), drawn in fg. Prime Video's logo was withdrawn
@@ -59,13 +60,25 @@
       return;
     }
     var apps = [];
+    // A sleeping HDMI device drops out of VIDEOSOURCE, so keep the inputs seen before as tiles.
     function withInputs() {
+      var seen = TH.load(INPUTS, []);
+      function finish(connected) {
+        connected.forEach(function (s) {
+          seen = seen.filter(function (o) { return o.number !== s.number; }).concat([{ number: s.number, editName: s.editName }]);
+        });
+        TH.save(INPUTS, seen);
+        seen.sort(function (a, b) { return a.number - b.number; }).forEach(function (o) {
+          var live = connected.filter(function (s) { return s.number === o.number; })[0];
+          apps.push(hdmiEntry(live || { type: 'HDMI', number: o.number, editName: o.editName }));
+        });
+        done(apps);
+      }
       try {
         tz.systeminfo.getPropertyValue('VIDEOSOURCE', function (info) {
-          (info.connected || []).forEach(function (s) { if (s.type === 'HDMI') { apps.push(hdmiEntry(s)); } });
-          done(apps);
-        }, function () { done(apps); });
-      } catch (e) { done(apps); }
+          finish((info.connected || []).filter(function (s) { return s.type === 'HDMI'; }));
+        }, function () { finish([]); });
+      } catch (e) { finish([]); }
     }
     try {
       tz.application.getAppsInfo(function (list) {
@@ -125,10 +138,29 @@
   };
 
   var watchingInput = false;
+  // setSource only takes the TV's own source objects. For a sleeping device that is the main
+  // window's current source when it is still on that port; switching to it wakes the device (CEC).
+  function sourceFor(entry, done) {
+    tz.systeminfo.getPropertyValue('VIDEOSOURCE', function (info) {
+      var live = (info.connected || []).filter(function (s) { return s.type === 'HDMI' && s.number === entry.raw.number; })[0];
+      var main = tz.tvwindow.getSource('MAIN');
+      done(live || (main && main.type === 'HDMI' && main.number === entry.raw.number ? main : null));
+    }, function () { done(null); });
+  }
+
   function showInput(entry) {
     if (!tz || !tz.tvwindow) { return TH.toast('Would switch to ' + entry.name); }
     try {
-      tz.tvwindow.setSource(entry.raw, function () {
+      sourceFor(entry, function (source) {
+        if (!source) { return TH.toast(entry.name + ' is asleep. Wake it with its own remote.'); }
+        switchTo(entry, source);
+      });
+    } catch (e) { TH.toast('Could not switch input'); }
+  }
+
+  function switchTo(entry, source) {
+    try {
+      tz.tvwindow.setSource(source, function () {
         tz.tvwindow.show(function () {
           watchingInput = true;
           document.body.classList.add('input');
