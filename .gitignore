@@ -1,0 +1,4 @@
+dist/
+app/js/key.js
+.DS_Store
+node_modules/
