@@ -36,6 +36,7 @@
   function tile(entry) {
     var t = el('div', 'tile');
     t.style.backgroundColor = entry.color;
+    if (entry.glow) { t.style.setProperty('--glow', entry.glow); }
     if (entry.logo || entry.wordmark) {
       t.classList.add('brand');
       t.style.color = entry.fg;
@@ -58,7 +59,7 @@
     return t;
   }
 
-  function current(st) { return TH.art.items(st.entries[st.app], st.app)[st.item % 4]; }
+  function current(st) { var items = TH.art.items(st.entries[st.app], st.app); return items[st.item % items.length]; }
 
   function copyBlock() {
     var box = el('div', 'copy');

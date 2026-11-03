@@ -19,6 +19,23 @@
     });
     header.push({ label: 'Samsung Home', run: TH.openSamsungHome });
     header.forEach(function (h) { h.node = nav.appendChild(el('span', 'hbtn', h.label)); });
+    // Inputs and Settings sit by the clock as icons, after a Wi-Fi strength indicator.
+    var status = document.getElementById('status');
+    status.innerHTML = '<span class="wifi">' + TH.icon('wifi') + '</span>';
+    ['inputs', 'settings'].forEach(function (which) {
+      var h = { key: null, run: function () { TH.openSystem(which); } };
+      h.node = status.appendChild(el('span', 'ibtn'));
+      h.node.innerHTML = TH.icon(which);
+      header.push(h);
+    });
+  }
+
+  function paintWifi() {
+    TH.wifi(function (s) {
+      var w = document.querySelector('#status .wifi');
+      w.hidden = s === null;
+      w.setAttribute('data-bars', s === null ? 0 : s > .66 ? 3 : s > .33 ? 2 : s > 0 ? 1 : 0);
+    });
   }
 
   function paintHeader() {
@@ -82,8 +99,31 @@
     if (entry) { TH.launch(entry); }
   }
 
+  // ---- idle clock: after 3 minutes without a key, a big clock over the current show ----
+  var IDLE_MS = 180000, idleTimer = 0;
+  function showIdle() {
+    if (document.hidden || TH.watchingInput() || !st.entries.length) { return resetIdle(); }
+    var box = document.getElementById('idle'), entry = st.entries[st.app];
+    var items = TH.art.items(entry, st.app), it = items[st.item % items.length], now = new Date();
+    box.style.backgroundImage = 'url("' + it.backdrop + '")';
+    box.children[0].textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M$/i, '');
+    box.children[1].textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+    box.children[2].textContent = (TH.art.live ? 'Trending on ' : '') + entry.name + ' · ' + it.title;
+    document.body.classList.add('idle');
+    // Next show and the time every 30 s while idle.
+    idleTimer = setTimeout(function () { st.item = (st.item + 1) % 8; showIdle(); }, 30000);
+  }
+  function resetIdle() {
+    clearTimeout(idleTimer);
+    document.body.classList.remove('idle');
+    idleTimer = setTimeout(showIdle, IDLE_MS);
+  }
+
   document.addEventListener('keydown', function (e) {
     var k = e.keyCode;
+    var wasIdle = document.body.classList.contains('idle');
+    resetIdle();
+    if (wasIdle) { e.preventDefault(); return; }  // the first key only wakes the screen
     if (TH.watchingInput()) {
       if (k === KEY.BACK || k === KEY.ESC) { e.preventDefault(); TH.leaveInput(); }
       return;
@@ -109,19 +149,22 @@
   setInterval(refreshArt, 3600 * 1000);
 
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) { TH.tell('/home'); refreshArt(); }
+    if (!document.hidden) { TH.tell('/home'); refreshArt(); paintWifi(); resetIdle(); }
   });
 
   // Every 20 s the art moves on to the next trending title for the focused app.
   setInterval(function () {
     if (document.hidden || st.style === 'wall' || st.style === 'cast' || (st.style === 'shelf' && st.row === 2)) { return; }
-    st.item = (st.item + 1) % 4;
+    st.item = (st.item + 1) % 8;
     style().focus(st);
   }, 20000);
 
   TH.startWatcher();
   TH.startClock();
   buildHeader();
+  paintWifi();
+  setInterval(paintWifi, 60000);
+  resetIdle();
   TH.loadEntries(function (entries) {
     st.entries = entries.length ? entries : [{ kind: 'samsung', name: 'Samsung Home', key: 'other', color: '#2a2d33' }];
     st.app = Math.min(prefs.app || 0, st.entries.length - 1);

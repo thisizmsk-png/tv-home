@@ -18,11 +18,13 @@
   // logo: a key in TH.LOGOS (logos.js, Simple Icons, CC0), drawn in fg. Prime Video's logo was withdrawn
   // from Simple Icons at Amazon's request, so it gets a typeset wordmark instead.
   var BRAND = {
-    netflix: { key: 'netflix', color: '#000000', fg: '#e50914', logo: 'netflix' },
-    'prime video': { key: 'prime', color: '#1a98ff', fg: '#ffffff', wordmark: 'prime video' },
-    youtube: { key: 'youtube', color: '#0f0f0f', fg: '#ff0000', logo: 'youtube' },
-    'apple tv': { key: 'appletv', color: '#000000', fg: '#ffffff', logo: 'appletv' }
+    netflix: { key: 'netflix', color: '#000000', fg: '#e50914', glow: '#e50914', logo: 'netflix' },
+    'prime video': { key: 'prime', color: '#1a98ff', fg: '#ffffff', glow: '#1a98ff', wordmark: 'prime video' },
+    youtube: { key: 'youtube', color: '#0f0f0f', fg: '#ff0000', glow: '#ff0000', logo: 'youtube' },
+    'apple tv': { key: 'appletv', color: '#000000', fg: '#ffffff', glow: '#f1efe9', logo: 'appletv' }
   };
+  // The TV's own Settings and Source (input list) screens, found on this model with getAppsInfo.
+  TH.SYSTEM_APPS = { settings: 'com.samsung.tv.coba.setting', inputs: 'org.tizen.SMSourceAPP' };
 
   function brandFor(name) {
     var lower = name.toLowerCase();
@@ -40,14 +42,14 @@
     var b = brandFor(name);
     var storeId = STORE_IDS[id] || (/^youtube$/i.test(name) ? YOUTUBE_STORE_ID : null);
     return { kind: 'app', id: id, storeId: storeId, name: name, icon: icon || '', key: b.key, color: b.color,
-      fg: b.fg, logo: b.logo, wordmark: b.wordmark };
+      fg: b.fg, glow: b.glow, logo: b.logo, wordmark: b.wordmark };
   }
 
   function hdmiEntry(source) {
     var name = source.editName || ('HDMI ' + source.number);
     // A Fire TV stick names itself over HDMI-CEC; show it as the device, not the port.
     return { kind: 'hdmi', id: 'hdmi' + source.number, name: name, sub: 'HDMI ' + source.number,
-      raw: source, key: 'hdmi', color: '#3d3217' };
+      raw: source, key: 'hdmi', color: '#3d3217', glow: '#f2b134' };
   }
 
   TH.loadEntries = function (done) {
@@ -135,6 +137,24 @@
       try { tz.application.launch('com.samsung.tv.csfs', null, function () { TH.tell('/home'); }); }
       catch (e) { TH.tell('/home'); }
     }, function () { TH.toast('Samsung Home is unavailable'); });
+  };
+
+  // Settings and the input list draw over TV Home, so the watcher keeps guarding the Home button.
+  TH.openSystem = function (which) {
+    if (!tz || !tz.application) { return TH.toast('Would open ' + which); }
+    try { tz.application.launch(TH.SYSTEM_APPS[which], null, function () { TH.toast('Could not open ' + which); }); }
+    catch (e) { TH.toast('Could not open ' + which); }
+  };
+
+  // Wi-Fi strength 0..1, or null when wired, offline or unknown.
+  TH.wifi = function (done) {
+    if (!tz || !tz.systeminfo) { return done(0.8); }
+    try {
+      tz.systeminfo.getPropertyValue('NETWORK', function (n) {
+        if (n.networkType !== 'WIFI') { return done(n.networkType === 'NONE' ? 0 : null); }
+        tz.systeminfo.getPropertyValue('WIFI_NETWORK', function (w) { done(w.signalStrength); }, function () { done(null); });
+      }, function () { done(null); });
+    } catch (e) { done(null); }
   };
 
   var watchingInput = false;

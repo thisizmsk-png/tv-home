@@ -5,15 +5,15 @@
 
   var API = 'https://api.themoviedb.org/3';
   var IMG = 'https://image.tmdb.org/t/p/';
-  var CACHE = 'tvhome.tmdb.v2';
+  var CACHE = 'tvhome.tmdb.v3';
   var TTL = 12 * 3600 * 1000;
   var KEY = window.TVHOME_TMDB_KEY || '';
 
-  // TMDB watch-provider ids for the US.
+  // TMDB US watch-provider ids, and the network ids of each service's own originals.
   var SOURCES = {
-    netflix: { provider: 8 },
-    prime: { provider: 9 },
-    appletv: { provider: 350 },
+    netflix: { provider: 8, network: 213 },
+    prime: { provider: 9, network: 1024 },
+    appletv: { provider: 350, network: 2552 },
     youtube: { trending: 'all/week' },
     hdmi: { trending: 'movie/week' },
     other: { trending: 'tv/day' }
@@ -78,10 +78,17 @@
     };
   }
 
+  function daysAgo(n) { return new Date(Date.now() - n * 864e5).toISOString().slice(0, 10); }
+
+  // What's current, not all-time popular: the service's own series with an episode in the last
+  // 60 days, and subscription movies from the last year with real viewership. Plain popularity
+  // kept old catalogue hits (Seinfeld, Columbo) on top for weeks.
   function fetchSource(source, done) {
     var calls = source.provider ? [
-      ['tv', '/discover/tv?watch_region=US&sort_by=popularity.desc&with_watch_providers=' + source.provider],
-      ['movie', '/discover/movie?watch_region=US&sort_by=popularity.desc&include_adult=false&with_watch_providers=' + source.provider]
+      ['tv', '/discover/tv?sort_by=popularity.desc&air_date.gte=' + daysAgo(60) + '&with_networks=' + source.network],
+      ['movie', '/discover/movie?watch_region=US&sort_by=popularity.desc&include_adult=false' +
+        '&with_watch_monetization_types=flatrate&vote_count.gte=50&primary_release_date.gte=' + daysAgo(365) +
+        '&with_watch_providers=' + source.provider]
     ] : [[null, '/trending/' + source.trending]];
     var left = calls.length, all = [];
     calls.forEach(function (c) {
@@ -92,7 +99,9 @@
         });
         if (--left === 0) {
           all.sort(function (a, b) { return b.popularity - a.popularity; });
-          done(all.slice(0, 8));
+          // Keep the top 16 and start at a different one each day, so the 8 shown move along.
+          var top = all.slice(0, 16), start = top.length ? Math.floor(Date.now() / 864e5) * 3 % top.length : 0;
+          done(top.slice(start).concat(top.slice(0, start)).slice(0, 8));
         }
       });
     });
