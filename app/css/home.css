@@ -87,7 +87,7 @@ body.idle .idle { opacity: 1; visibility: visible; }
 .style-marquee .copy { top: 250px; }
 .style-marquee .apps { position: absolute; left: 96px; bottom: 84px; }
 
-/* ---- 3 Shelf ---- */
+/* ---- 2 Shelf ---- */
 .style-shelf .bg { bottom: 40%; }
 .style-shelf .scrim { background:
   linear-gradient(90deg, rgba(8,9,11,.85) 0%, rgba(8,9,11,.35) 34%, rgba(8,9,11,0) 56%),
@@ -104,7 +104,7 @@ body.idle .idle { opacity: 1; visibility: visible; }
 .card.on { transform: scale(1.08); z-index: 2; }
 .card.on::after { opacity: 1; }
 
-/* ---- 4 Poster Wall ---- */
+/* ---- 3 Poster Wall ---- */
 .style-wall .wall { display: flex; gap: 22px; padding: 0 22px; opacity: .6; }
 .wall .col { flex: 1; display: flex; flex-direction: column; gap: 22px; animation: rise 60s linear infinite; will-change: transform; }
 .wall .col:nth-child(2n) { animation-direction: reverse; animation-duration: 75s; }
@@ -115,7 +115,7 @@ body.idle .idle { opacity: 1; visibility: visible; }
 .style-wall .title .big { font-size: 200px; }
 .dock { position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%); background: var(--panel); padding: 26px; border-radius: 16px; }
 
-/* ---- 5 Cast ---- */
+/* ---- 4 Cast ---- */
 .style-cast .scrim { display: none; }
 .word { position: absolute; left: -20px; bottom: -70px; font: 800 520px/.8 var(--display); text-transform: uppercase; color: rgba(20, 8, 4, .26); white-space: nowrap; }
 .portrait { position: absolute; right: 150px; top: 180px; bottom: 0; width: 640px; background: #1a1d22 center 20% / cover no-repeat; box-shadow: 0 0 0 10px var(--paper); }

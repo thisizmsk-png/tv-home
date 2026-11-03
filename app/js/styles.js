@@ -94,7 +94,7 @@
     activate: function (st) { return st.entries[st.app]; }
   };
 
-  // ---------- 3 Shelf ----------
+  // ---------- 2 Shelf ----------
   var shelf = {
     name: 'Shelf',
     rows: function (st) { return [st.entries.length, TH.art.items(st.entries[st.app], st.app).length]; },
@@ -136,7 +136,7 @@
     activate: function (st) { return st.entries[st.app]; }
   };
 
-  // ---------- 4 Poster Wall ----------
+  // ---------- 3 Poster Wall ----------
   var wall = {
     name: 'Wall',
     rows: function (st) { return [st.entries.length]; },
@@ -175,7 +175,7 @@
     activate: function (st) { return st.entries[st.app]; }
   };
 
-  // ---------- 5 Cast ----------
+  // ---------- 4 Cast ----------
   var FIELDS = ['#a5452c', '#2f5b70', '#6d5a1f', '#4a4d80', '#3d6047', '#6b3350', '#5a4632'];
   var cast = {
     name: 'Cast',

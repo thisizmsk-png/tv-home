@@ -15,7 +15,7 @@
     var nav = document.getElementById('header');
     nav.innerHTML = '';
     header = TH.styleOrder.map(function (key, i) {
-      return { label: (['1', '3', '4', '5'][i]) + ' ' + TH.styles[key].name, key: key, run: function () { setStyle(key); } };
+      return { label: (i + 1) + ' ' + TH.styles[key].name, key: key, run: function () { setStyle(key); } };
     });
     header.push({ label: 'Samsung Home', run: TH.openSamsungHome });
     header.forEach(function (h) { h.node = nav.appendChild(el('span', 'hbtn', h.label)); });
