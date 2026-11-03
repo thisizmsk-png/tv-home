@@ -17,6 +17,8 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--ink); color: var(--paper); font: 400 28px/1.35 var(--body); }
+/* Clip the oversized art layer and long rows here; anything past the edge makes Tizen zoom the page out. */
+body { position: relative; }
 body.input { background: transparent; }
 body.input > *:not(#hdmi):not(#toast) { visibility: hidden; }
 [hidden] { display: none !important; }

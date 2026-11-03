@@ -33,7 +33,9 @@ async function press(name, times = 1) {
 
 await send('Runtime.enable');
 await send('Page.enable');
-await sleep(1500);
+// Keys sent before the app list loads are lost, so wait for the first build.
+for (let i = 0; i < 40 && !/^style-/.test(await evaluate('document.body.className') || ''); i++) await sleep(500);
+await sleep(1000);
 console.log('state', JSON.stringify(await evaluate(`({
   style: document.body.className,
   apps: [].map.call(document.querySelectorAll('.tile .name, .item'), n => n.firstChild && n.firstChild.textContent),
