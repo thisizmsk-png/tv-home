@@ -1,10 +1,10 @@
-# TV Home
+# Clean TV Home for Samsung
 
 Your Samsung TV's home screen, rebuilt around what is actually on. Every app shows its newest shows full screen, in four looks you switch with the remote. No ad row, no TV Plus, no root.
 
 <img src="docs/hero.gif" width="960" alt="The four looks on a 65 inch Samsung: Marquee, Shelf, Wall and Cast">
 
-[Watch the 40 second demo](docs/demo.mp4) (the four looks, then the install). Every TV picture here is a screenshot taken from the TV itself.
+[Watch the 30 second demo](docs/demo.mp4) (the four looks, then the install). Every TV picture here is a screenshot taken from the TV itself.
 
 ## Four looks
 
@@ -65,3 +65,4 @@ node tools/tv-check.mjs <out-dir>                           # on the TV: errors,
 - App logos (Netflix, YouTube, Apple TV): Simple Icons 16.35.0, CC0 (`app/js/logos.js`). The marks are trademarks of their owners and are used only to label the apps. Prime Video is a typeset wordmark because Amazon had its logo withdrawn from Simple Icons.
 - Trending art and data from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.
 - Screenshots in `docs/` show TMDB images and app marks for illustration; they belong to their owners.
+- The demo's soundtrack is made entirely in code with [earshot](https://github.com/Leonxlnx/earshot) 0.4.0 (MIT): its kalimba and glockenspiel voices for the music and its launch kit for the effects. No recordings or samples.

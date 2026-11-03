@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://github.com/local/tv-home" version="0.1.0" viewmodes="maximized">
-  <name>TV Home</name>
+  <name>Clean TV Home for Samsung</name>
   <icon src="icon.png"/>
   <content src="index.html"/>
   <tizen:app-control>
