@@ -1,0 +1,20 @@
+/* Fallbacks for older Tizen web engines (2021 Tizen 6.0 is Chromium 76): no flexbox gap
+   (Chromium 84) and no aspect-ratio (Chromium 88). js/compat.js sets the classes on <html>. */
+
+/* Row direction: space between siblings on the left. */
+.no-flexgap .header > * + * { margin-left: 10px; }
+.no-flexgap .status > * + * { margin-left: 14px; }
+.no-flexgap .row > * + * { margin-left: 28px; }
+.no-flexgap .cards > * + * { margin-left: 26px; }
+.no-flexgap .style-wall .wall > * + * { margin-left: 22px; }
+
+/* Column direction: space between siblings on top. */
+.no-flexgap .idle > * + * { margin-top: 14px; }
+.no-flexgap .copy > * + * { margin-top: 20px; }
+.no-flexgap .style-shelf .band > * + * { margin-top: 22px; }
+.no-flexgap .wall .col > * + * { margin-top: 22px; }
+.no-flexgap .list > * + * { margin-top: 14px; }
+.no-flexgap .who > * + * { margin-top: 10px; }
+
+/* Posters keep 2:3 with the padding trick. */
+.no-aspect .poster { height: 0; padding-top: 150%; }
